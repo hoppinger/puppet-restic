@@ -14,7 +14,7 @@ class restic(
   $restic_download_url              = 'https://github.com/restic/restic/releases/download/v0.9.5/restic_0.9.5_linux_amd64.bz2',
   $restic_pre_command               = '',
   $restic_keep_prune_job            = true,
-  $restic_keep_prune_job_random     = true,    # if enabled a random hour and weekday will be taken in which a prune and forget job wil run instead of backup. 
+  $restic_keep_prune_job_random     = true,    # if enabled a random hour and weekday will be taken in which a prune and forget job wil run instead of backup.
   $restic_keep_prune_job_hour       = 10,      # hour when random = false
   $restic_keep_prune_job_weekday    = 6,       # prune by default on saturday
   $restic_keep_last                 = 60,      # restic forget options
@@ -50,7 +50,7 @@ class restic(
   $mysqlshowcompatibility56         = true,   # needed for most mysql install on ubuntu 16.04LTS
   $cronminute                       = '*/20', # cronminute is ignored then $cronrandom is true
   $cronrandom                       = true,   # randomize minute 0-59 for spreading backups every hour
-  $cronhour                         = '*',    # if cronhour = * then time_between_hourlybackup is active else time_between_backup is used,. 
+  $cronhour                         = '*',    # if cronhour = * then time_between_hourlybackup is active else time_between_backup is used,.
   $restic_backup_path               = '/',
   $exclude_list                     = [
                                       '/bin',
@@ -94,6 +94,9 @@ class restic(
   $restorecronhour                  = '5',
   $restorecronweekday               = '0',
   $restorecronmonthday              = '*',
+
+  #monitoring options
+  $sensu_check                      = true,
 
 )
 {
@@ -189,7 +192,7 @@ $pre_command_array = [$restic_pre_command, $sambascript, $mysqlscript, $pgsqlscr
     mode                    => '0700'
   }
 
-# set random minute if cronrandom=true, this implies hourly backups. 
+# set random minute if cronrandom=true, this implies hourly backups.
   if ($cronrandom == true){
      $_cronminute = fqdn_rand(59)
   } else {
@@ -258,27 +261,26 @@ $pre_command_array = [$restic_pre_command, $sambascript, $mysqlscript, $pgsqlscr
     class { 'restic::restore': }
   }
 
+  if($restic::sensu_check == true){
+  # Add entries to sudoers sensu user must start check using sudo permissions
+    augeas { "sudochkbackup":
+      context => "/files/etc/sudoers",
+      changes => [
+        "set Cmnd_Alias[alias/name = 'RESTICSERVICES']/alias/name RESTICSERVICES",
+        "set Cmnd_Alias[alias/name = 'RESTICSERVICES']/alias/command[1] '${restic_path}/chkrestic.sh'",
+        "set spec[user = 'sensu']/user sensu",
+        "set spec[user = 'sensu']/host_group/host ALL",
+        "set spec[user = 'sensu']/host_group/command RESTICSERVICES",
+        "set spec[user = 'sensu']/host_group/command/runas_user root",
+        "set spec[user = 'sensu']/host_group/command/tag NOPASSWD",
+        ],
+    }
 
-# Add entries to sudoers sensu user must start check using sudo permissions
-  augeas { "sudochkbackup":
-    context => "/files/etc/sudoers",
-    changes => [
-      "set Cmnd_Alias[alias/name = 'RESTICSERVICES']/alias/name RESTICSERVICES",
-      "set Cmnd_Alias[alias/name = 'RESTICSERVICES']/alias/command[1] '${restic_path}/chkrestic.sh'",
-      "set spec[user = 'sensu']/user sensu",
-      "set spec[user = 'sensu']/host_group/host ALL",
-      "set spec[user = 'sensu']/host_group/command RESTICSERVICES",
-      "set spec[user = 'sensu']/host_group/command/runas_user root",
-      "set spec[user = 'sensu']/host_group/command/tag NOPASSWD",
-      ],
+
+  # export check so sensu monitoring can make use of it
+    @@sensu::check { 'Check Restic Backup' :
+      command => "sudo ${restic_path}/chkrestic.sh",
+      tag     => 'central_sensu',
+    }
   }
-
-
-# export check so sensu monitoring can make use of it
-  @@sensu::check { 'Check Restic Backup' :
-    command => "sudo ${restic_path}/chkrestic.sh",
-    tag     => 'central_sensu',
-  }
-
-
 }
