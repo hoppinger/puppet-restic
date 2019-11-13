@@ -2,7 +2,7 @@ puppet-restic
 ==================
 
 Restic role manifest for puppet in a foreman environment.
-Creates: 
+Creates:
 - config files, exclude file, password file , and scripts for manual restic commands, cron driven usage and sensu checks in /opt/restic
 - cronjob for backup with loging in /var/log/restic
 - logrotate for restic logs
@@ -26,7 +26,7 @@ All parameters are read from defaults in init.pp and can be overwritten by hiera
   $restic_download_url              = 'https://github.com/restic/restic/releases/download/v0.9.2/restic_0.9.2_linux_amd64.bz2',
   $restic_pre_command               = '',
   $restic_keep_prune_job            = true,
-  $restic_keep_prune_job_random     = true,    # if enabled a random hour will be taken in which a prune and forget job wil run instead of backup. 
+  $restic_keep_prune_job_random     = true,    # if enabled a random hour will be taken in which a prune and forget job wil run instead of backup.
   $restic_keep_prune_job_hour       = 10,       # hour when random = false
   $restic_keep_last                 = 60,       # restic forget options
   $restic_keep_within_duration      = '60d',    # restic forget options
@@ -60,7 +60,7 @@ All parameters are read from defaults in init.pp and can be overwritten by hiera
   $mysqlshowcompatibility56         = true,   # needed for most mysql install on ubuntu 16.04LTS
   $cronminute                       = '*/20', # cronminute is ignored then $cronrandom is true
   $cronrandom                       = true,   # randomize minute 0-59 for spreading backups every hour
-  $cronhour                         = '*',    # if cronhour = * then time_between_hourlybackup is active else time_between_backup is used,. 
+  $cronhour                         = '*',    # if cronhour = * then time_between_hourlybackup is active else time_between_backup is used,.
   $restic_backup_path               = '/',
   $exclude_list                     = [
                                       '/bin',
@@ -105,6 +105,8 @@ All parameters are read from defaults in init.pp and can be overwritten by hiera
   $restorecronweekday               = '0',
   $restorecronmonthday              = '*',
 
+  #monitoring options
+  $sensu_check                      = true,
 ```
 
 Classes
@@ -120,7 +122,7 @@ Dependencies
 
 Result
 -------------
-Configurable cron run Restic installation including monitoring scripts. 
+Configurable cron run Restic installation including monitoring scripts.
 
 
 Limitations
