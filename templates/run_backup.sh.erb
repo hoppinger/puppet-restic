@@ -60,6 +60,10 @@ BACKUP_NEEDED=0
 HOST=`hostname`
 KEEPLAST=<%= @restic_keep_last %>
 KEEPWITHINDURATION=<%= @restic_keep_within_duration %>
+KEEPDAILY=<%= @restic_keep_daily %>
+KEEPWEEKLY=<%= @restic_keep_weekly %>
+KEEPMONTHLY=<%= @restic_keep_monthly %>
+KEEPYEARLY=<%= @restic_keep_yearly %>
 PRUNEHOUR=<%= @prune_hour %>
 PRUNEWEEKDAY=<%= @prune_weekday %>
 CURRENTTIME=`date +%s`
@@ -121,14 +125,14 @@ if [ "$PRUNEWEEKDAY" = "$CURRENTWEEKDAY" ] && [ "$PRUNEHOUR" = "$CURRENTHOUR" ];
     for forget_host in "${hosts_array[@]}"
       do
         echo "$(date '+%Y-%m-%d %H:%M:%S') -- Forget snapshots with keeping atleast $KEEPLAST and not forgetting earlier than $KEEPWITHINDURATION for host ${forget_host}"
-        $RUN_RESTIC --host ${forget_host} forget --keep-last $KEEPLAST --keep-within $KEEPWITHINDURATION 2>&1 >> /var/log/restic/restic.log
+        $RUN_RESTIC --host ${forget_host} forget --keep-last $KEEPLAST --keep-within $KEEPWITHINDURATION --keep-daily $KEEPDAILY --keep-weekly $KEEPWEEKLY --keep-monthly $KEEPMONTHLY --keep-yearly $KEEPYEARLY 2>&1 >> /var/log/restic/restic.log
 
         # when forget action fails then try again in 1 minute, create warning state when failed for a second time. 
         if [ $? = "1" ] ; then
           echo "$(date '+%Y-%m-%d %H:%M:%S') -- Backup forget action first try failed, waiting 1 minute and try to clear stale locks before 2nd try"
           sleep 1m
           $RUN_RESTIC unlock 2>&1 >> /var/log/restic/restic.log
-          $RUN_RESTIC --host ${forget_host} forget --keep-last $KEEPLAST --keep-within $KEEPWITHINDURATION 2>&1 >> /var/log/restic/restic.log
+          $RUN_RESTIC --host ${forget_host} forget --keep-last $KEEPLAST --keep-within $KEEPWITHINDURATION --keep-daily $KEEPDAILY --keep-weekly $KEEPWEEKLY --keep-monthly $KEEPMONTHLY --keep-yearly $KEEPYEARLY 2>&1 >> /var/log/restic/restic.log
           if [ $? = "1" ] ; then
            echo "$(date '+%Y-%m-%d %H:%M:%S') -- Backup forget action failed to run"
            cleanup

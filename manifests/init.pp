@@ -19,6 +19,10 @@ class restic(
   $restic_keep_prune_job_weekday    = 6,       # prune by default on saturday
   $restic_keep_last                 = 60,      # restic forget options
   $restic_keep_within_duration      = '60d',   # restic forget options
+  $restic_keep_daily                = 60,      # restic forget options
+  $restic_keep_weekly               = 0,       # restic forget options
+  $restic_keep_monthly              = 0,       # restic forget options
+  $restic_keep_yearly               = 0,       # restic forget options
   $restic_disable_during_prune      = true,    # disable running backups during prune_job_hour and prune_job_hour+prune_hours
   $restic_disable_during_prune_hours= 12,      # amount of hours to let prune complete
   $restic_enable_swap               = false,   # enables the use of a temporary swapfile which might help with out of memory issues
