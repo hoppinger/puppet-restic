@@ -6,6 +6,8 @@ class restic(
   $restic_aws_access_key            = "XXXXXXXXXXXXXXXXXX",
   $restic_aws_secret_key            = "XXXXXXXXXXXXXXXXXX",
   $restic_aws_default_region        = 'us-east-1',
+  $restic_azure_account_name        = "XXXXXXXXXXXXXXXXXX",
+  $restic_azure_account_key         = "XXXXXXXXXXXXXXXXXX",
   $restic_password                  = "backuppassword",
   $restic_aws_repo                  = "s3:https://s3.amazonaws.com/restic-repo-name",
   $restic_upload_limit              = '204800',

@@ -17,6 +17,8 @@ All parameters are read from defaults in init.pp and can be overwritten by hiera
 # general options
   $restic_aws_access_key            = "XXXXXXXXXXXXXXXXXX",
   $restic_aws_secret_key            = "XXXXXXXXXXXXXXXXXX",
+  $restic_azure_account_name        = "XXXXXXXXXXXXXXXXXX",
+  $restic_azure_account_key         = "XXXXXXXXXXXXXXXXXX",
   $restic_password                  = "backuppassword",
   $restic_aws_repo                  = "s3:https://s3.amazonaws.com/restic-repo-name",
   $restic_upload_limit              = '204800',
